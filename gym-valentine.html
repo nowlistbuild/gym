@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>💪 You're My Workout Partner For Life! 💪</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&display=swap');
+
+    :root {
+      --iron: #2c3e50;
+      --muscle: #e74c3c;
+      --energy: #f39c12;
+      --protein: #3498db;
+    }
+
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: 'Oswald', sans-serif;
+      overflow: hidden;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Gym floor grid */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 49px,
+          rgba(255,255,255,0.03) 49px,
+          rgba(255,255,255,0.03) 50px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent 49px,
+          rgba(255,255,255,0.03) 49px,
+          rgba(255,255,255,0.03) 50px
+        );
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .gym-card {
+      width: min(550px, 92vw);
+      background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+      border: 4px solid var(--energy);
+      border-radius: 20px;
+      padding: 35px 25px;
+      box-shadow: 
+        0 25px 70px rgba(0,0,0,0.6),
+        inset 0 0 30px rgba(0,0,0,0.3);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Motivational banner */
+    .banner {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--muscle);
+      color: white;
+      padding: 6px 20px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(14px, 3vw, 18px);
+      letter-spacing: 2px;
+      box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+      border-radius: 5px;
+    }
+
+    /* Gym equipment scene */
+    .gym-scene {
+      position: relative;
+      width: 100%;
+      max-width: 350px;
+      margin: 20px auto 25px;
+      height: 200px;
+    }
+
+    /* Dumbbells forming heart */
+    .dumbbell {
+      position: absolute;
+      width: 100px;
+      height: 40px;
+      top: 80px;
+    }
+
+    .dumbbell-left {
+      left: 30px;
+      transform: rotate(-30deg);
+    }
+
+    .dumbbell-right {
+      right: 30px;
+      transform: rotate(30deg);
+    }
+
+    .weight {
+      width: 30px;
+      height: 40px;
+      background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
+      border: 2px solid #2c3e50;
+      border-radius: 5px;
+      position: absolute;
+      top: 0;
+      box-shadow: inset -3px -3px 8px rgba(0,0,0,0.3);
+    }
+
+    .weight-left { left: 0; }
+    .weight-right { right: 0; }
+
+    .bar {
+      width: 50px;
+      height: 8px;
+      background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+      position: absolute;
+      top: 16px;
+      left: 25px;
+      border-radius: 4px;
+    }
+
+    /* Heart between dumbbells */
+    .heart-weight {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 60px;
+      animation: pump 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 5px 15px rgba(231, 76, 60, 0.5));
+    }
+
+    @keyframes pump {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.2); }
+    }
+
+    /* Rep counter */
+    .rep-counter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.5);
+      color: var(--energy);
+      padding: 8px 15px;
+      border-radius: 10px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(16px, 3.5vw, 22px);
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(28px, 5.5vw, 44px);
+      color: white;
+      margin: 20px 0 10px;
+      line-height: 1.2;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+    }
+
+    .motto {
+      font-size: clamp(14px, 3vw, 18px);
+      color: var(--energy);
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .workout-zone {
+      position: relative;
+      height: 210px;
+      margin: 25px 0;
+      background: rgba(0,0,0,0.3);
+      border: 3px solid rgba(243, 156, 18, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    button {
+      position: absolute;
+      padding: 18px 35px;
+      font-family: 'Bebas Neue', cursive;
+      font-weight: 700;
+      font-size: clamp(16px, 3.5vw, 22px);
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      text-transform: uppercase;
+    }
+
+    #yesBtn {
+      left: 10%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(135deg, var(--muscle) 0%, #c0392b 100%);
+      color: white;
+    }
+
+    #yesBtn:hover {
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 12px 30px rgba(231, 76, 60, 0.5);
+    }
+
+    #yesBtn::before {
+      content: "💪 ";
+    }
+
+    #noBtn {
+      right: 10%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
+      color: #2c3e50;
+    }
+
+    .hint {
+      font-size: clamp(12px, 2.5vw, 15px);
+      color: #95a5a6;
+      margin-top: 15px;
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    .result {
+      display: none;
+      animation: flex 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes flex {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(-10deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .result h2 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(32px, 6vw, 52px);
+      color: var(--energy);
+      margin: 20px 0;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px rgba(243, 156, 18, 0.6);
+    }
+
+    .celebration {
+      font-size: clamp(16px, 3.5vw, 22px);
+      color: white;
+      line-height: 1.8;
+      margin-top: 20px;
+      font-weight: 600;
+    }
+
+    .trophy-emoji {
+      font-size: clamp(70px, 12vw, 120px);
+      display: block;
+      margin: 25px 0;
+      animation: lift 1.5s ease-in-out infinite;
+    }
+
+    @keyframes lift {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .gains {
+      color: var(--muscle);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Burpee animation */
+    .burpee {
+      animation: doBurpee 0.8s ease;
+    }
+
+    @keyframes doBurpee {
+      0% { transform: translateY(-50%) scaleY(1); }
+      25% { transform: translateY(-30%) scaleY(0.6); }
+      50% { transform: translateY(-50%) scaleY(1); }
+      75% { transform: translateY(-70%) scaleY(0.8); }
+      100% { transform: translateY(-50%) scaleY(1); }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <main class="gym-card">
+    <div class="banner">NO PAIN, NO GAIN</div>
+
+    <!-- Gym Scene -->
+    <div class="gym-scene">
+      <div class="rep-counter">♾️ REPS</div>
+      
+      <!-- Left Dumbbell -->
+      <div class="dumbbell dumbbell-left">
+        <div class="weight weight-left"></div>
+        <div class="bar"></div>
+        <div class="weight weight-right"></div>
+      </div>
+
+      <!-- Right Dumbbell -->
+      <div class="dumbbell dumbbell-right">
+        <div class="weight weight-left"></div>
+        <div class="bar"></div>
+        <div class="weight weight-right"></div>
+      </div>
+
+      <!-- Heart -->
+      <div class="heart-weight">💪❤️</div>
+    </div>
+
+    <h1>YOU'RE MY</h1>
+    <h1>WORKOUT PARTNER</h1>
+    <h1>FOR LIFE!</h1>
+    <p class="motto">🏋️ Be My Valentine? 🏋️</p>
+
+    <div class="workout-zone" id="workoutZone">
+      <button id="yesBtn">Let's Go!</button>
+      <button id="noBtn">Skip Day</button>
+    </div>
+
+    <div class="hint" id="hint">
+      "Skip Day" does burpees away! 💪
+    </div>
+
+    <div class="result" id="result">
+      <h2>PERSONAL RECORD!</h2>
+      <span class="trophy-emoji">🏆💪🔥</span>
+      <div class="celebration">
+        Together we're <span class="gains">unstoppable!</span><br/>
+        You + Me = Ultimate Team!<br/>
+        <strong style="color: var(--energy);">Happy Valentine's Day!</strong>
+        <div style="margin-top: 10px; font-size: clamp(14px, 3vw, 18px);">
+          💯 RELATIONSHIP GAINS 💯
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const workoutZone = document.getElementById("workoutZone");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const result = document.getElementById("result");
+    const hint = document.getElementById("hint");
+
+    /* CONFETTI */
+    const confettiCanvas = document.getElementById("confettiCanvas");
+    
+    function resizeConfettiCanvas() {
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      confettiCanvas.width = Math.floor(window.innerWidth * dpr);
+      confettiCanvas.height = Math.floor(window.innerHeight * dpr);
+    }
+
+    resizeConfettiCanvas();
+    window.addEventListener("resize", resizeConfettiCanvas);
+
+    const confettiInstance = confetti.create(confettiCanvas, {
+      resize: false,
+      useWorker: true
+    });
+
+    function gymConfetti() {
+      const colors = ['#e74c3c', '#f39c12', '#3498db', '#95a5a6'];
+      const end = Date.now() + 3000;
+
+      (function frame() {
+        confettiInstance({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.6 },
+          colors: colors,
+          shapes: ['square'],
+          scalar: 1.5
+        });
+        confettiInstance({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.6 },
+          colors: colors,
+          shapes: ['square'],
+          scalar: 1.5
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
+
+    /* YES BUTTON GROWS */
+    let yesScale = 1;
+    function growYes() {
+      yesScale = Math.min(1.6, yesScale + 0.06);
+      yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
+    }
+
+    /* NO BUTTON DOES BURPEES */
+    let burpeeCount = 0;
+    
+    function doBurpees(px, py) {
+      const w = workoutZone.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+      
+      const distance = Math.hypot(
+        (b.left + b.width / 2) - px,
+        (b.top + b.height / 2) - py
+      );
+
+      if (distance < 140) {
+        // Add burpee animation
+        noBtn.classList.add('burpee');
+        
+        setTimeout(() => {
+          noBtn.classList.remove('burpee');
+        }, 800);
+        
+        // Move to new position after burpee
+        setTimeout(() => {
+          let currentRight = parseFloat(noBtn.style.right) || 10;
+          let currentTop = parseFloat(noBtn.style.top) || 50;
+          
+          // Jump to random spot (like finishing a burpee)
+          currentRight = Math.random() * 60 + 5;
+          currentTop = Math.random() * 60 + 20;
+          
+          noBtn.style.right = currentRight + "%";
+          noBtn.style.top = currentTop + "%";
+          
+          burpeeCount++;
+          noBtn.textContent = burpeeCount % 2 === 0 ? "Skip Day" : "Nope!";
+        }, 400);
+        
+        growYes();
+      }
+    }
+
+    workoutZone.addEventListener("pointermove", e => {
+      doBurpees(e.clientX, e.clientY);
+    });
+
+    noBtn.addEventListener("click", e => e.preventDefault());
+
+    /* YES CLICK */
+    yesBtn.addEventListener("click", () => {
+      workoutZone.style.display = "none";
+      hint.style.display = "none";
+      result.style.display = "block";
+      resizeConfettiCanvas();
+      gymConfetti();
+    });
+  </script>
+</body>
+</html>
